@@ -1,0 +1,7 @@
+[user]
+	email = orensbruli@gmail.com
+	name = Esteban Martinena
+[diff]
+	tool = meld
+[difftool]
+	prompt = false
