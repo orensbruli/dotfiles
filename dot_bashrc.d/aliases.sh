@@ -23,3 +23,5 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 alias hh=hstr                    # hh to be alias for hstr
 
 alias top="bashtop"
+
+alias v="vim"
