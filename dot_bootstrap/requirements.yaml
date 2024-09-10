@@ -1,0 +1,32 @@
+# Google Chrome
+- name: googlechrome
+  src: https://github.com/darkwizard242/ansible-role-googlechrome.git
+  scm: git
+# nvidia driver
+- name: nvidia
+  src: https://github.com/NVIDIA/ansible-role-nvidia-driver.git
+  scm: git
+- name: nvidia-docker
+  src: https://github.com/NVIDIA/ansible-role-nvidia-docker.git
+  scm: git
+# terraform
+- name: terraform
+  src: https://github.com/diodonfrost/ansible-role-terraform.git
+  scm: git
+# vagrant
+- name: vagrant
+  src: https://github.com/buluma/ansible-role-vagrant.git
+  scm: git
+# virtualbox
+- name: virtualbox
+  src: https://github.com/buluma/ansible-role-virtualbox.git
+  scm: git
+# Docker
+- name: docker
+  src: https://github.com/geerlingguy/ansible-role-docker.git
+  scm: git
+# Compose
+- name: docker-compose
+  src: https://github.com/buluma/ansible-role-docker_compose.git
+  scm: git  
+
