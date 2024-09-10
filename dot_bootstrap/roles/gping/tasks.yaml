@@ -1,0 +1,37 @@
+---
+- name: Check if gping is installed
+  command: which gping
+  register: gping_check
+  ignore_errors: yes
+  changed_when: false
+
+- name: Install Azlux repository and gping if not already installed
+  block:
+    - name: Ensure GPG is installed
+      apt:
+        name: gpg
+        state: present
+        update_cache: yes
+
+    - name: Add the Azlux GPG key
+      ansible.builtin.command: |
+        curl -s https://azlux.fr/repo.gpg.key | gpg --dearmor -o /usr/share/keyrings/azlux.gpg
+      args:
+        creates: /usr/share/keyrings/azlux.gpg
+
+    - name: Add Azlux repository
+      ansible.builtin.apt_repository:
+        repo: 'deb [signed-by=/usr/share/keyrings/azlux.gpg] https://packages.azlux.fr/debian/ bookworm main'
+        state: present
+        filename: 'azlux.list'
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Ensure gping is installed
+      apt:
+        name: gping
+        state: present
+
+  when: gping_check.rc != 0
