@@ -22,7 +22,6 @@
           - build-essential
           - bzip2
           - ca-certificates
-          - containerd.io
           - curl
           - fd-find
           - ffmpeg
