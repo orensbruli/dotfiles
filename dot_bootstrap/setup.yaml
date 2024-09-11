@@ -44,6 +44,7 @@
           - vim
           - virtualbox-dkms
           - vlc
+          - unzip
           - chrome-gnome-shell
 
         #          - vagrant
