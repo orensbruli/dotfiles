@@ -1,5 +1,6 @@
-sudo apt update
+#!/bin/bash
 
+sudo apt update
 # Install ansible
 if ! command -v ansible-playbook &> /dev/null; then
     sudo apt install -y ansible
