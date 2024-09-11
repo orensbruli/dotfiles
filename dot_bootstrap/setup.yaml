@@ -11,18 +11,7 @@
     - nvidia_driver_skip_reboot: true
     - ansible_distribution: Ubuntu
   
-  roles:
-    - googlechrome
-    - terraform
-    - vagrant
-    - virtualbox
-    - docker
-    - docker-compose
-    - gping
-    - zoom
-
-  tasks:
-
+  pre_tasks:
     - name: Install packages
       ansible.builtin.apt:
         name:
@@ -56,10 +45,23 @@
           - virtualbox-dkms
           - vlc
           - chrome-gnome-shell
-        
+
         #          - vagrant
-#          - python3
+        #          - python3
         state: present
+  roles:
+    - googlechrome
+    - terraform
+    - vagrant
+    - virtualbox
+    - docker
+    - docker-compose
+    - gping
+    - zoom
+
+  tasks:
+
+   
 
 #    - name: Check if an NVIDIA card is present
 #      shell: "lspci | grep -i nvidia"
