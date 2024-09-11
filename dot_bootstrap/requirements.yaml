@@ -17,10 +17,6 @@
 - name: vagrant
   src: https://github.com/buluma/ansible-role-vagrant.git
   scm: git
-# virtualbox
-- name: virtualbox
-  src: https://github.com/buluma/ansible-role-virtualbox.git
-  scm: git
 # Docker
 - name: docker
   src: https://github.com/geerlingguy/ansible-role-docker.git
@@ -29,4 +25,8 @@
 - name: docker-compose
   src: https://github.com/buluma/ansible-role-docker_compose.git
   scm: git  
-
+# zoom
+- name: zoom
+  src: https://github.com/alvistack/ansible-role-zoom.git
+  scm: git
+    

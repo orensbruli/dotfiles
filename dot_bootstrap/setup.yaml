@@ -5,176 +5,179 @@
   connection: local
   gather_facts: true
 
+  vars:
+    - googlechrome_desired_state: latest
+    - terraform_version: 0.12.0-rc1
+    - nvidia_driver_skip_reboot: true
+    - ansible_distribution: Ubuntu
+  
+  roles:
+    - googlechrome
+    - terraform
+    - vagrant
+    - virtualbox
+    - docker
+    - docker-compose
+    - gping
+    - gitkraken
+    - zoom
+   
+
+
   tasks:
-    - name: Get my user
-      ansible.builtin.set_fact:
-        remote_regular_user: "{{ ansible_env.SUDO_USER or ansible_user_id }}"
-
-    - name: Create directory for Docker's GPG key
-      ansible.builtin.file:
-        path: /etc/apt/keyrings
-        state: directory
-        mode: '0755'
-
-    - name: Add Docker's official GPG key
-      ansible.builtin.apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        keyring: /etc/apt/keyrings/docker.gpg
-        state: present
-
-    - name: Print architecture variables
-      ansible.builtin.debug:
-        msg: "Architecture: {{ ansible_architecture }}, Codename: {{ ansible_lsb.codename }}"
-
-    - name: Add Docker repository
-      ansible.builtin.apt_repository:
-        repo: >-
-          deb [arch={{ arch_mapping[ansible_architecture] | default(ansible_architecture) }}
-          signed-by=/etc/apt/keyrings/docker.gpg]
-          https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
-        filename: docker
-        state: present
-
-    - name: Add HashiCorp GPG Key
-      apt_key:
-        url: https://apt.releases.hashicorp.com/gpg
-        state: present
-
-    
-    - name: Add HashiCorp APT repository
-      apt_repository:
-        repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release }} main"
 
     - name: Install packages
       ansible.builtin.apt:
         name:
-          - git
-          - bashtop
-          - vim
-          - gcc
-          - tmux
-          - make
-          - patch
-          - bzip2
-          - libnsl2
-          - fd-find
+          - apt-transport-https
+          - asciinema
           - autoconf
-          - inotify-tools
-          - toilet
-          - fzf
-          - ffmpeg
-          - vlc
-          - imagemagick
-          - gstreamer1.0-tools
+          - bashtop
           - build-essential
+          - bzip2
+          - ca-certificates
+          - containerd.io
+          - curl
+          - fd-find
+          - ffmpeg
+          - gcc
+          - git
+          - gnupg
+          - gstreamer1.0-tools
+          - imagemagick
+          - inotify-tools
+          - libnsl2
+          - make
           - openssh-client
           - openvpn
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - docker-buildx-plugin
-          - docker-compose-plugin
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - gnupg
+          - patch
           - software-properties-common
+          - tmux
+          - tree
+          - toilet
+          - vim
+          - virtualbox-dkms
+          - vlc
+          - chrome-gnome-shell
         
         #          - vagrant
 #          - python3
         state: present
 
+#    - name: Check if an NVIDIA card is present
+#      shell: "lspci | grep -i nvidia"
+#      register: nvidia_card
+#      changed_when: false
+#      ignore_errors: true
+#    
+#    # Block to handle NVIDIA card detection and setup
+#    - block:
+#
+#        - name: Debug NVIDIA card presence
+#          debug:
+#            msg: "NVIDIA card found: {{ nvidia_card.stdout }}"
+#
+#        - name: Add the graphics-drivers PPA repository (if NVIDIA card is present)
+#          apt_repository:
+#            repo: ppa:graphics-drivers/ppa
+#            state: present
+#
+#        - name: Update apt cache after adding repository (deferred until after the check)
+#          apt:
+#            update_cache: yes
+#
+#        - name: Find the recommended NVIDIA driver version
+#          shell: "ubuntu-drivers devices | grep third-party | grep -v open | sort -r | head -n 1 | awk '{print $3}'"
+#          register: latest_nvidia_version
+#          changed_when: false
+#
+#        - name: Debug latest NVIDIA driver version
+#          debug:
+#            msg: "Recommended NVIDIA driver: {{ latest_nvidia_version.stdout }}"
+#
+#        - name: Ask for confirmation to install the NVIDIA driver
+#          pause:
+#            prompt: "NVIDIA driver {{ latest_nvidia_version.stdout }} will be installed. Do you want to continue? (yes/no)"
+#          register: install_confirmation
+#
+#        - name: Set fact to skip driver installation if not confirmed
+#          set_fact:
+#            install_driver: "{{ 'yes' if install_confirmation.user_input == 'yes' else 'no' }}"
+#
+#
+#      when: nvidia_card.stdout != ""
+#      name: NVIDIA Card Detection and Setup Block
+#      rescue:
+#        - debug:
+#            msg: "No NVIDIA card detected or an error occurred during detection. Skipping NVIDIA driver installation."
+#
+#    # Block to handle the NVIDIA driver installation
+#    - block:
+#        - name: Install the recommended NVIDIA driver
+#          apt:
+#            name: "{{ latest_nvidia_version.stdout }}"
+#            state: present
+#
+#        - name: Ensure the driver is loaded correctly
+#          command: "nvidia-smi"
+#          register: nvidia_smi_output
+#          ignore_errors: yes
+#
+#        - name: Reboot the system if NVIDIA drivers were installed
+#          reboot:
+#            msg: "Rebooting to apply NVIDIA drivers."
+#      when: install_driver == "yes"
+#      name: NVIDIA Driver Installation Block
+#      rescue:
+#        - debug:
+#            msg: "NVIDIA driver installation failed, but continuing with other tasks."
 
-    - name: Add Docker group
-      ansible.builtin.group:
-        name: docker
-        state: present
+#    # FZF
+#    - name: make sure git is installed
+#      package:
+#        name: git
+#        state: present
+#    
+#    - name: fetch fzf from github
+#      git:
+#        repo: 'https://github.com/junegunn/fzf.git'
+#        dest: /tmp/fzf/
+#        version: HEAD # latest
+#      become: no
+#    
+#    - name: Mark /tmp/fzf as a safe directory
+#      command: git config --global --add safe.directory /tmp/fzf
+#      become: no
+#    
+#    - name: Run install script
+#      script: /tmp/fzf/install --all
+#      become: no
 
-    - name: Add user to Docker group
-      ansible.builtin.user:
-        name: "{{ ansible_user_id }}"
-        groups: docker
-        append: true
-
-    - name: Enable and start Docker services
-      ansible.builtin.systemd:
-        name: "{{ item }}"
-        enabled: true
-        state: started
-      loop:
-        - docker.service
-        - containerd.service
-
-    - name: Install Terraform
+    - name: Install Flatpak package manager (if not already installed)
       apt:
-        name: terraform
+        name: flatpak
         state: present
 
+    - name: Add the Flathub repository (if not already added)
+      command: flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+      args:
+        creates: /var/lib/flatpak/repo/flathub
+      become: no
 
-    - name: Check if an NVIDIA card is present
-      shell: "lspci | grep -i nvidia"
-      register: nvidia_card
-      changed_when: false
-      ignore_errors: true
-    
-    # Block to handle NVIDIA card detection and setup
-    - block:
+    - name: Install Slack using Flatpak
+      flatpak:
+        name: com.slack.Slack
+        state: present
+        remote: flathub
+        method: user  # or system if you prefer system-wide installation
+      become: no
 
-        - name: Debug NVIDIA card presence
-          debug:
-            msg: "NVIDIA card found: {{ nvidia_card.stdout }}"
+    - name: Verify Slack installation
+      command: flatpak run com.slack.Slack --version
+      register: slack_version
+      ignore_errors: yes
+      become: no
 
-        - name: Add the graphics-drivers PPA repository (if NVIDIA card is present)
-          apt_repository:
-            repo: ppa:graphics-drivers/ppa
-            state: present
-
-        - name: Update apt cache after adding repository (deferred until after the check)
-          apt:
-            update_cache: yes
-
-        - name: Find the recommended NVIDIA driver version
-          shell: "ubuntu-drivers devices | grep recommended | awk '{print $3}'"
-          register: latest_nvidia_version
-          changed_when: false
-
-        - name: Debug latest NVIDIA driver version
-          debug:
-            msg: "Recommended NVIDIA driver: {{ latest_nvidia_version.stdout }}"
-
-        - name: Ask for confirmation to install the NVIDIA driver
-          pause:
-            prompt: "NVIDIA driver {{ latest_nvidia_version.stdout }} will be installed. Do you want to continue? (yes/no)"
-          register: install_confirmation
-
-        - name: Set fact to skip driver installation if not confirmed
-          set_fact:
-            install_driver: "{{ 'yes' if install_confirmation.user_input == 'yes' else 'no' }}"
-
-
-      when: nvidia_card.stdout != ""
-      name: NVIDIA Card Detection and Setup Block
-      rescue:
-        - debug:
-            msg: "No NVIDIA card detected or an error occurred during detection. Skipping NVIDIA driver installation."
-
-    # Block to handle the NVIDIA driver installation
-    - block:
-        - name: Install the recommended NVIDIA driver
-          apt:
-            name: "{{ latest_nvidia_version.stdout }}"
-            state: present
-
-        - name: Ensure the driver is loaded correctly
-          command: "nvidia-smi"
-          register: nvidia_smi_output
-          ignore_errors: yes
-
-        - name: Reboot the system if NVIDIA drivers were installed
-          reboot:
-            msg: "Rebooting to apply NVIDIA drivers."
-      when: install_driver == "yes"
-      name: NVIDIA Driver Installation Block
-      rescue:
-        - debug:
-            msg: "NVIDIA driver installation failed, but continuing with other tasks."
+    - name: Debug Slack version output
+      debug:
+        msg: "Installed Slack version: {{ slack_version.stdout }}"
